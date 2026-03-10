@@ -2,11 +2,18 @@
 # Zappa will pip install these when packaging for Lambda
 
 # Option 1: Install from local directories (current structure)
+# Use regular installs (not editable) so files are copied to site-packages
+# This is required for Lambda/Zappa deployment
 ../dev/renglo-lib
 ../dev/renglo-api
 ../extensions/noma/package
-../extensions/enerclave/package
-../extensions/scheduler/package
+../extensions/pes/package
+../extensions/pes_noma/package
+
+# Note: The following extensions are commented out as they don't exist yet
+# Uncomment and install when available:
+# -e ../extensions/enerclave/package
+# -e ../extensions/scheduler/package
 
 # Option 2: If these are on GitHub, use git URLs instead:
 # git+https://github.com/your-org/renglo-lib.git@main#egg=renglo-lib
