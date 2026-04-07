@@ -13,12 +13,12 @@ Use this sequence:
 
 ## 2) Repositories Included In Backend Deploy
 
-Backend deployment installs from **Noma-Travel** only ([`requirements-noma-travel.txt`](requirements-noma-travel.txt)), referenced by [`requirements.txt`](requirements.txt). For a full local workspace layout without git installs, use [`requirements-local.txt`](requirements-local.txt) instead.
+Backend deployment currently installs from a **hybrid Noma-Travel set** in [`requirements-noma-travel.txt`](requirements-noma-travel.txt), referenced by [`requirements.txt`](requirements.txt). It uses Noma-Travel repos where available and temporary local workspace fallbacks for repos still being created in Noma-Travel.
 
 - `https://github.com/Noma-Travel/renglo-lib.git`
 - `https://github.com/Noma-Travel/renglo-api.git`
-- `https://github.com/Noma-Travel/noma-handlers.git` (handlers package; path `extensions/noma/package` in local trees)
-- `https://github.com/Noma-Travel/pes.git`
+- `https://github.com/Noma-Travel/noma-handlers.git` (target repo; currently using local fallback `../extensions/noma/package` until created)
+- `https://github.com/Noma-Travel/pes.git` (currently skipped in migration; local fallback remains)
 - `https://github.com/Noma-Travel/pes_noma.git`
 
 Commonly used alongside console runtime:
@@ -35,7 +35,7 @@ Commonly used alongside console runtime:
    `git push noma-travel main_noma:main` (adjust names as needed).
 4. Set `origin` to Noma-Travel and remove `renglo` remotes from your workspace clones to avoid accidental pushes upstream.
 
-After mirrors exist, `pip install -r requirements.txt` in `system` resolves packages from Noma-Travel. Until then, use `pip install -r requirements-local.txt` before `./zappa_update.sh`.
+During migration, run `pip install -r requirements.txt` (hybrid set) before `./zappa_update.sh`. Once `Noma-Travel/noma-handlers` (and any skipped repos) are ready, replace local fallback lines with git URLs and pin branches/tags.
 
 ## 3) Environment Variables That Control Context
 
@@ -198,3 +198,4 @@ Use a fresh user and verify:
 - If browser shows CORS errors after backend deploy, re-check `FE_BASE_URL` / `APP_FE_BASE_URL` and redeploy backend.
 - If testing local frontend against deployed backend, temporarily enable `ALLOW_DEV_ORIGINS` and redeploy backend.
 - If onboarding data looks stale after resets, refresh tree cache path and rerun post-deploy setup sequence.
+

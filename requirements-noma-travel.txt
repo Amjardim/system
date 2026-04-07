@@ -1,9 +1,11 @@
-# Install from Noma-Travel GitHub (after mirrors exist and branches are pushed).
-# Order matches dependency chain. Pin @tag or @commit after releases.
+# Hybrid install set while migration finishes.
+# Uses Noma-Travel repos where available and local workspace fallbacks
+# for repos not created yet in Noma-Travel.
 # Usage: pip install -r requirements-noma-travel.txt
 
-git+https://github.com/Noma-Travel/renglo-lib.git@main#egg=renglo-lib
+git+https://github.com/Noma-Travel/renglo-lib.git@main_noma#egg=renglo-lib
 git+https://github.com/Noma-Travel/renglo-api.git@main#egg=renglo-api
-git+https://github.com/Noma-Travel/noma-handlers.git@main#egg=noma-mod
-git+https://github.com/Noma-Travel/pes.git@main#egg=pes-mod
-git+https://github.com/Noma-Travel/pes_noma.git@main#egg=pes-noma-mod
+../extensions/noma/package
+../extensions/pes/package
+git+https://github.com/Noma-Travel/pes_noma.git@main#egg=pes-noma-mod&subdirectory=package
+

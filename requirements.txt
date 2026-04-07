@@ -1,4 +1,4 @@
-# Backend Lambda bundle: install from Noma-Travel GitHub mirrors only.
-# Before first deploy, mirror renglo repos into Noma-Travel and push main.
-# If mirrors are not ready, use: pip install -r requirements-local.txt
+# Backend Lambda bundle install set used by deployment script.
+# During migration, this references requirements-noma-travel.txt (hybrid)
+# so deployment can continue while missing Noma-Travel repos are created.
 -r requirements-noma-travel.txt
