@@ -7,3 +7,21 @@ env.production
 .wheelhouse_test*/
 parsed_rextur_result.json
 rextur_response.json
+
+# Deployment/runtime artifacts (local only)
+.freeze.txt
+.wheelhouse/
+.venv_deploy/
+handler_venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Local helper/config files
+env_config.py
+zappa_settings.json
+run.sh
+package-lock.json
+.gitmodules
