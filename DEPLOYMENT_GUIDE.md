@@ -15,10 +15,12 @@ Use this sequence:
 
 Backend deployment currently installs from a **hybrid Noma-Travel set** in [`requirements-noma-travel.txt`](requirements-noma-travel.txt), referenced by [`requirements.txt`](requirements.txt). It uses Noma-Travel repos where available and temporary local workspace fallbacks for repos still being created in Noma-Travel.
 
+For a full table of Git `origin` URLs across this workspace, see [`WORKSPACE_GITHUB_ORIGINS.md`](WORKSPACE_GITHUB_ORIGINS.md).
+
 - `https://github.com/Noma-Travel/renglo-lib.git`
 - `https://github.com/Noma-Travel/renglo-api.git`
-- `https://github.com/Noma-Travel/noma-handlers.git` (target repo; currently using local fallback `../extensions/noma/package` until created)
-- `https://github.com/Noma-Travel/pes.git` (currently skipped in migration; local fallback remains)
+- `https://github.com/Noma-Travel/noma_handlers.git` (handlers package lives under `package/`; pip uses `subdirectory=package`)
+- `https://github.com/Noma-Travel/pes.git` (not created yet; `requirements-noma-travel.txt` still uses local `../extensions/pes/package` until migrated)
 - `https://github.com/Noma-Travel/pes_noma.git`
 
 Commonly used alongside console runtime:
@@ -35,7 +37,7 @@ Commonly used alongside console runtime:
    `git push noma-travel main_noma:main` (adjust names as needed).
 4. Set `origin` to Noma-Travel and remove `renglo` remotes from your workspace clones to avoid accidental pushes upstream.
 
-During migration, run `pip install -r requirements.txt` (hybrid set) before `./zappa_update.sh`. Once `Noma-Travel/noma-handlers` (and any skipped repos) are ready, replace local fallback lines with git URLs and pin branches/tags.
+Run `pip install -r requirements.txt` before `./zappa_update.sh`. When `Noma-Travel/pes` exists, replace the local `pes` path in [`requirements-noma-travel.txt`](requirements-noma-travel.txt) with a git URL (and `subdirectory=package` like other handler packages).
 
 ## 3) Environment Variables That Control Context
 
