@@ -107,7 +107,7 @@ For the current Noma production stack (`noma_prod_websocket`), the WebSocket Api
 - `NEXT_PUBLIC_CHAT_WS` = `wss://3vdnaldxj0.execute-api.us-east-1.amazonaws.com/production`
 - `WEBSOCKET_CONNECTIONS` = `https://3vdnaldxj0.execute-api.us-east-1.amazonaws.com/production`
 
-**`$connect` and JWT:** Full WebSocket setup (routes, `chat_message` → `POST …/_chat/message`, and `$connect` / `$disconnect` as **MOCK** integrations) is described in [`dev/launcher/ENVIRONMENT_README.md`](../dev/launcher/ENVIRONMENT_README.md) §7 and in [`dev/launcher/scripts/create_websocket_api.py`](../dev/launcher/scripts/create_websocket_api.py). With MOCK `$connect`, API Gateway does **not** validate the `?auth=` query string at connect time; the Cognito JWT is validated when messages hit `/_chat/message` (`socket_auth_required` in `renglo-api`).
+**`$connect` and JWT:** Full WebSocket setup (routes, `chat_message` → `POST …/_chat/message`, and `$connect` / `$disconnect` as **MOCK** integrations) is described in the launcher repo: `dev/launcher/ENVIRONMENT_README.md` §7 and `dev/launcher/scripts/create_websocket_api.py`. With MOCK `$connect`, API Gateway does **not** validate the `?auth=` query string at connect time; the Cognito JWT is validated when messages hit `/_chat/message` (`socket_auth_required` in `renglo-api`).
 
 ---
 
