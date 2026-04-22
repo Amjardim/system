@@ -35,6 +35,7 @@ PYTHON_BIN="${PYTHON_BIN:-python3}"
 WHEELHOUSE=".wheelhouse"
 DEPLOY_VENV=".venv_deploy"
 FREEZE_FILE=".freeze.txt"
+ZAPPA_SETTINGS_FILE="zappa_settings.json"
 
 # Track original environment
 ORIG_VENV="${VIRTUAL_ENV:-}"
@@ -71,6 +72,67 @@ cleanup() {
 }
 trap cleanup EXIT
 
+validate_cors_settings() {
+  echo "==> Preflight: Validating CORS settings in $ZAPPA_SETTINGS_FILE (stage: $STAGE)"
+
+  if [[ ! -f "$ZAPPA_SETTINGS_FILE" ]]; then
+    echo "ERROR: Missing $ZAPPA_SETTINGS_FILE in $(pwd)." >&2
+    echo "       Aborting deploy to prevent publishing unknown CORS config." >&2
+    return 1
+  fi
+
+  local validation_output
+  if ! validation_output=$($PYTHON_BIN - "$ZAPPA_SETTINGS_FILE" "$STAGE" <<'PY'
+import json
+import sys
+
+settings_file = sys.argv[1]
+stage = sys.argv[2]
+
+with open(settings_file, "r", encoding="utf-8") as fh:
+    data = json.load(fh)
+
+if stage not in data:
+    print(f"ERROR: Stage '{stage}' not found in {settings_file}")
+    sys.exit(1)
+
+stage_cfg = data.get(stage) or {}
+env = stage_cfg.get("environment_variables") or {}
+
+fe_base = str(env.get("FE_BASE_URL", "")).strip().rstrip("/")
+app_fe = str(env.get("APP_FE_BASE_URL", "")).strip().rstrip("/")
+cors_extra = str(env.get("CORS_ALLOWED_ORIGINS", "")).strip()
+
+origin_set = set()
+if fe_base:
+    origin_set.add(fe_base)
+if app_fe:
+    origin_set.add(app_fe)
+if cors_extra:
+    for raw in cors_extra.split(","):
+        origin = raw.strip().rstrip("/")
+        if origin:
+            origin_set.add(origin)
+
+if not origin_set:
+    print("ERROR: Missing CORS origins. Define FE_BASE_URL and/or CORS_ALLOWED_ORIGINS.")
+    sys.exit(1)
+
+print("OK: CORS origin preflight passed")
+for origin in sorted(origin_set):
+    print(f"ORIGIN: {origin}")
+PY
+); then
+    echo "$validation_output" >&2
+    return 1
+  fi
+
+  echo "$validation_output" | while IFS= read -r line; do
+    echo "    $line"
+  done
+  echo ""
+}
+
 echo "=========================================="
 echo "Zappa Deployment Script"
 echo "Stage: $STAGE"
@@ -82,6 +144,8 @@ else
 fi
 echo "=========================================="
 echo ""
+
+validate_cors_settings
 
 # Step 0: Clean old artifacts
 echo "==> Step 0: Preparing build environment"
