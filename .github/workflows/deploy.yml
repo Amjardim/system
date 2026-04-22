@@ -53,6 +53,27 @@ jobs:
       - name: Write zappa_settings.json from secret
         run: echo '${{ secrets.ZAPPA_SETTINGS }}' > zappa_settings.json
 
+      - name: Validate required CORS environment variables
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+
+          with open("zappa_settings.json", "r", encoding="utf-8") as fh:
+              data = json.load(fh)
+
+          stage = data.get("noma_prod") or {}
+          env = stage.get("environment_variables") or {}
+
+          required = ("FE_BASE_URL", "APP_FE_BASE_URL")
+          missing = [k for k in required if not str(env.get(k, "")).strip()]
+          if missing:
+              print(f"ERROR: Missing required zappa env vars: {', '.join(missing)}")
+              sys.exit(1)
+
+          print("zappa_settings.json validation OK for CORS-critical variables")
+          PY
+
       - name: Deploy with Zappa
         run: |
           source venv/bin/activate
