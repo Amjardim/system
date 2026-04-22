@@ -8,6 +8,12 @@ env.production
 parsed_rextur_result.json
 rextur_response.json
 
+# Runtime debug dumps and local deploy/verify scratch (do not commit)
+debug/
+.verify_noma_handlers/
+.verify_wheels/
+_deployed_*.zip
+
 # Deployment/runtime artifacts (local only)
 .freeze.txt
 .wheelhouse/

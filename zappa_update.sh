@@ -66,6 +66,9 @@ cleanup() {
   echo ""
   echo "==> Cleaning up..."
 
+  # Windows venv activate can strip MSYS paths; restore coreutils + mingw64 for bash/cygpath.
+  export PATH="/mingw64/bin:/usr/bin:/bin:${PATH:-}"
+
   # If Step 13 failed after Step 12 moved .wheelhouse aside, put it back (next run needs it).
   if [[ -n "${WHEELHOUSE_TMP:-}" && -d "${WHEELHOUSE_TMP}/wheelhouse" ]] && [[ ! -d "$WHEELHOUSE" ]]; then
     echo "==> Restoring wheelhouse (deploy interrupted before normal restore)..."
@@ -132,6 +135,22 @@ if [[ -z "${VIRTUAL_ENV:-}" ]]; then
   exit 1
 fi
 echo "    Current venv: $VIRTUAL_ENV"
+
+# Cursor / minimal hosts: a prior broken `source venv/Scripts/activate` can leave
+# _OLD_VIRTUAL_PATH pointing at a Windows-only PATH; the next line in activate runs
+# `cygpath` after `deactivate` restores that PATH — cygpath disappears. Fix PATH and
+# re-source this venv once so _OLD_* matches a MSYS-safe PATH.
+if [[ "${OSTYPE:-}" == "msys" || "${OSTYPE:-}" == "cygwin" ]] && [[ -n "${VIRTUAL_ENV:-}" ]]; then
+  export PATH="/mingw64/bin:/usr/bin:/bin:${PATH:-}"
+  unset _OLD_VIRTUAL_PATH _OLD_VIRTUAL_PYTHONHOME _OLD_VIRTUAL_PS1 2>/dev/null || true
+  if [[ -f "${VIRTUAL_ENV}/Scripts/activate" ]]; then
+    # shellcheck disable=SC1090
+    source "${VIRTUAL_ENV}/Scripts/activate"
+  elif [[ -f "${VIRTUAL_ENV}/bin/activate" ]]; then
+    # shellcheck disable=SC1090
+    source "${VIRTUAL_ENV}/bin/activate"
+  fi
+fi
 
 # Prefer the active venv's interpreter (avoids Windows Store python3 / wrong PATH)
 if [[ -x "$VIRTUAL_ENV/Scripts/python.exe" ]]; then
@@ -310,6 +329,8 @@ deactivate 2>/dev/null || true
 rm -rf "$DEPLOY_VENV"
 "$PYTHON_BIN" -m venv "$DEPLOY_VENV"
 source_venv "$DEPLOY_VENV"
+# Windows Scripts/activate drops MSYS paths; restore for basename/grep/mktemp/rm.
+export PATH="/mingw64/bin:/usr/bin:/bin:${PATH:-}"
 
 # Interpreter inside the deploy venv. Do NOT reuse PYTHON_BIN here — it still points at the
 # original dev venv; using it for DEPLOY_SITE or import checks installs/verifies the wrong tree

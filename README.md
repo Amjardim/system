@@ -212,7 +212,7 @@ cd extensions
 Clone the system extensions  (schd, data, pes) 
 
 ```
-git clone https://github.com/renglo/schd.git
+git clone https://github.com/Noma-Travel/schd.git
 git clone https://github.com/renglo/data.git
 git clone https://github.com/renglo/pes.git
 ```
