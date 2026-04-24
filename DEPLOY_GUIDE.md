@@ -1,5 +1,9 @@
 # Zappa Deployment Guide
 
+For the **full NOMA stack** (frontend, env, WebSocket, hybrid requirements, `zappa_update.sh`), use **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)**. This file is a shorter Zappa-focused note for this branch.
+
+---
+
 ## Production deploy (noma_prod)
 
 To deploy the backend with **latest renglo-lib and extensions/noma** (e.g. after tool-install-on-org-creation changes):
