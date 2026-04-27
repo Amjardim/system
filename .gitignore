@@ -21,6 +21,9 @@ _deployed_*.zip
 .freeze.txt
 .wheelhouse/
 .venv_deploy/
+# Ephemeral Zappa step: werkzeug/ copied to project root for packaging (see zappa_update.sh Step 8c)
+werkzeug/
+.werkzeug_vendored_for_zappa
 handler_venv/
 venv/
 __pycache__/
