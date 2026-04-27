@@ -436,6 +436,25 @@ if [[ ${#EDITABLE_PATHS[@]} -gt 0 ]]; then
   done
 fi
 
+# Step 8b: Freeze + --target may install renglo-* from pip's cached wheel (stale vs your working tree).
+# Always refresh renglo-lib / renglo-api from ../dev so Lambda gets the same code you edit locally.
+echo ""
+echo "==> Step 8b: Refresh renglo-lib and renglo-api from dev tree (no stale pip cache)"
+_RENGLO_LIB="${SCRIPT_DIR}/../dev/renglo-lib"
+_RENGLO_API="${SCRIPT_DIR}/../dev/renglo-api"
+if [[ -d "$_RENGLO_LIB" ]]; then
+  echo "    pip install --force-reinstall: $_RENGLO_LIB"
+  "$DEPLOY_PYTHON" -m pip install --no-cache-dir --force-reinstall --no-deps "$_RENGLO_LIB"
+else
+  echo "    (skip) not found: $_RENGLO_LIB"
+fi
+if [[ -d "$_RENGLO_API" ]]; then
+  echo "    pip install --force-reinstall: $_RENGLO_API"
+  "$DEPLOY_PYTHON" -m pip install --no-cache-dir --force-reinstall --no-deps "$_RENGLO_API"
+else
+  echo "    (skip) not found: $_RENGLO_API"
+fi
+
 # Step 8c: Zappa's Windows+manylinux zip merge can omit pure-Python packages from site-packages
 # even when they import in the deploy venv. Zappa's handler.py imports werkzeug before the app
 # (see venv/Lib/site-packages/zappa/handler.py). Vendoring ensures /var/task/werkzeug exists in Lambda.
