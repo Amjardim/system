@@ -439,6 +439,25 @@ if [[ ${#EDITABLE_PATHS[@]} -gt 0 ]]; then
   done
 fi
 
+# Step 8d: Git-installed packages (renglo-*, noma-mod, pes-noma-mod) are stripped from the
+# freeze file and ../dev paths are absent on GitHub Actions. Install them explicitly for CI.
+echo ""
+echo "==> Step 8d: Installing CI git packages from requirements.ci.txt"
+if [[ -f requirements.ci.txt ]]; then
+  if [[ "${ZAPPA_LAMBDA_WHEEL_PLATFORM:-1}" == "0" ]]; then
+    "$DEPLOY_PYTHON" -m pip install --no-cache-dir -r requirements.ci.txt
+  else
+    "$DEPLOY_PYTHON" -m pip install --no-cache-dir -r requirements.ci.txt --target "$DEPLOY_SITE" --upgrade
+  fi
+  echo "    Verifying CI package imports..."
+  "$DEPLOY_PYTHON" -c "import renglo_api, renglo, noma; print('    CI packages import OK')" || {
+    echo "ERROR: requirements.ci.txt packages failed to import in deploy venv" >&2
+    exit 1
+  }
+else
+  echo "    (skip) requirements.ci.txt not found"
+fi
+
 # Step 8b: Freeze + --target may install renglo-* from pip's cached wheel (stale vs your working tree).
 # Always refresh renglo-lib / renglo-api from ../dev so Lambda gets the same code you edit locally.
 echo ""
